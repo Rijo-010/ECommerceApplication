@@ -63,7 +63,7 @@ namespace ECommerce.Api.Controllers
         }
 
 
-        
+
         [HttpDelete("hard/{id}")]
         public IActionResult Delete(int id)
         {
