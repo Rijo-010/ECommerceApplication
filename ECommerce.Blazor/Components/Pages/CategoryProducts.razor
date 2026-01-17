@@ -1,0 +1,32 @@
+@page "/category/{CategoryId:int}"
+@using ECommerce.Blazor.Services
+@inject ApiService ApiService
+@rendermode InteractiveServer
+
+<h2 class="page-title">@categoryName</h2>
+
+<div class="product-grid">
+    @foreach (var p in products)
+    {
+        <div class="product-card">
+            <img src="@($"{ApiService.BaseUrl}{p.ImageUrl}")" />
+            <h4>@p.Name</h4>
+            <p class="price">₹@p.Price</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int CategoryId { get; set; }
+
+    string categoryName = "";
+    List<ProductDto> products = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ApiService.GetProductsByCategoryAsync(CategoryId);
+
+        if (products.Any())
+            categoryName = products.First().CategoryName;
+    }
+}

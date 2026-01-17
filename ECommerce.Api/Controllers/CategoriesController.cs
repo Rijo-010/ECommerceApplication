@@ -40,6 +40,17 @@ namespace ECommerce.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPut("toggle/{id}")]
+        public IActionResult Toggle(int id)
+        {
+            var success = _service.Activate(id);
+            if (!success)
+                return NotFound();
+
+            return NoContent();
+        }
+
+
         [HttpDelete("{id}")]
         public IActionResult Deactivate(int id)
         {

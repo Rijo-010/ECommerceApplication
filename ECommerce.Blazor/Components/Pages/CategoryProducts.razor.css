@@ -1,0 +1,37 @@
+.page-title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 700;
+    margin: 30px 0;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    text-align: center;
+}
+
+.product-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.product-card h4 {
+    margin: 10px 0 4px;
+    font-size: 16px;
+}
+
+.price {
+    font-weight: 600;
+    color: #ff6a4d;
+}

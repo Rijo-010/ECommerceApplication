@@ -1,0 +1,115 @@
+@page "/products"
+@using ECommerce.Blazor.Services
+@inject ApiService ApiService
+@rendermode InteractiveServer
+@using ECommerce.Blazor.State
+@inject CartState CartState
+<div class="products-page-header">
+    <h1 class="products-title">All Products</h1>
+    <p class="products-subtitle">Browse and discover what you love</p>
+</div>
+
+
+<div class="products-filters">
+    <input placeholder="Search products..."
+           @bind="searchText"
+           @bind:event="oninput" />
+
+    <select @bind="selectedCategoryId">
+        <option value="0">All Categories</option>
+        @foreach (var c in categories)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+
+    <select @bind="availability">
+        <option value="all">All</option>
+        <option value="in">In Stock</option>
+        <option value="out">Out of Stock</option>
+    </select>
+
+    <input type="number" placeholder="Min ₹" @bind="minPrice" />
+    <input type="number" placeholder="Max ₹" @bind="maxPrice" />
+</div>
+
+
+<div class="product-grid">
+    @if (!FilteredProducts.Any())
+    {
+        <p class="empty-text">No products found</p>
+    }
+    else
+    {
+        @foreach (var p in FilteredProducts)
+        {
+           <div class="product-card">
+    <img src="@($"{ApiService.BaseUrl}{p.ImageUrl}")" />
+
+    <h4>@p.Name</h4>
+
+    <p class="desc">@p.Description</p>
+
+    <p class="price">₹@p.Price</p>
+
+    <span class="stock @(p.StockQuantity > 0 ? "in" : "out")">
+        @(p.StockQuantity > 0 ? "In Stock" : "Out of Stock")
+    </span>
+
+    <button class="cart-btn"
+            disabled="@(p.StockQuantity == 0)"
+            @onclick="() => AddToCart(p)">
+        Add to Cart
+    </button>
+    @if (!string.IsNullOrEmpty(successMessage) && successMessage.Contains(p.Name))
+    {
+        <p class="success-text">@successMessage</p>
+    }
+</div>
+
+        }
+    }
+</div>
+
+@code {
+    List<ProductDto> products = new();
+    List<CategoryDto> categories = new();
+
+    string searchText = "";
+    int selectedCategoryId = 0;
+    string availability = "all";
+    decimal? minPrice;
+    decimal? maxPrice;
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await ApiService.GetActiveCategoriesAsync();
+        products = await ApiService.GetAllProductsAsync();
+    }
+
+    IEnumerable<ProductDto> FilteredProducts =>
+        products.Where(p =>
+            p.IsActive &&
+            (string.IsNullOrWhiteSpace(searchText) ||
+                p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
+            (selectedCategoryId == 0 || p.CategoryId == selectedCategoryId) &&
+            (availability == "all" ||
+                (availability == "in" && p.StockQuantity > 0) ||
+                (availability == "out" && p.StockQuantity == 0)) &&
+            (!minPrice.HasValue || p.Price >= minPrice) &&
+            (!maxPrice.HasValue || p.Price <= maxPrice)
+        );
+
+string? successMessage;
+
+
+      async  void AddToCart(ProductDto product)
+{
+    CartState.Add(product);
+    successMessage = $"{product.Name} added to cart!";
+    await Task.Delay(2000);
+    successMessage = null;
+
+}
+
+}

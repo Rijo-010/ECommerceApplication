@@ -1,0 +1,182 @@
+/* CATEGORY PAGE */
+.category-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.category-form input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+}
+
+.category-form button {
+    padding: 10px 16px;
+    background: #ff6a4d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 14px;
+    text-align: left;
+}
+
+.admin-table th {
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.admin-table tr:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.status.active {
+    color: green;
+    font-weight: 600;
+}
+
+.status.inactive {
+    color: #9ca3af;
+}
+
+button.danger {
+    background: #dc2626;
+    color: white;
+    margin-left: 6px;
+}
+/* CATEGORY PAGE */
+.category-header {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+/* Add Category Form */
+.category-form {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.category-form input {
+    padding: 11px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+.category-form button {
+    padding: 11px 18px;
+    background: #ff6a4d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.category-form button:hover {
+    background: #e65a40;
+}
+
+/* Search Filter */
+.filter-input {
+    max-width: 320px;
+    padding: 11px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+/* Table */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 15px 16px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.admin-table th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+}
+
+.admin-table tr:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Status */
+.status.active {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.status.inactive {
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Action Buttons */
+.admin-table button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.admin-table button:hover {
+    opacity: 0.9;
+}
+
+button.danger {
+    background: #dc2626;
+    color: white;
+    margin-left: 8px;
+}
+.admin-page-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.admin-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+}
+
+.admin-subtitle {
+    font-size: 15px;
+    color: #6b7280;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.5;
+}

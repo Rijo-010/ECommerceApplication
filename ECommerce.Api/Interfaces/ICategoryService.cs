@@ -7,6 +7,7 @@ namespace ECommerce.Api.Interfaces
         CategoryDto Create(CreateCategoryDto dto);
         CategoryDto? Update(int id, CreateCategoryDto dto);
         bool Deactivate(int id);
+        bool Activate(int id);
         List<CategoryDto> GetAll();
         List<CategoryDto> GetActive();
 

@@ -22,7 +22,7 @@ namespace ECommerce.Api.Models.Entities
         [Range(0, int.MaxValue)]
         public int StockQuantity { get; set; }
 
-        [MaxLength(300)]
+        [MaxLength(900)]
         public string? ImageUrl { get; set; }
 
         public bool IsActive { get; set; } = true;

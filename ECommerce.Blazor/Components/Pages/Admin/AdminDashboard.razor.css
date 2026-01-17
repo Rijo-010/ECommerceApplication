@@ -1,0 +1,64 @@
+/* ADMIN DASHBOARD */
+.admin-header {
+    margin-bottom: 35px;
+}
+
+.admin-header {
+    text-align: center;
+}
+
+.admin-title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.admin-subtitle {
+    color: #6b7280;
+    font-size: 15px;
+}
+
+
+.admin-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.admin-card {
+    background: linear-gradient(180deg, #ffffff, #fafafa);
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+}
+
+.admin-card-icon {
+    font-size: 34px;
+    margin-bottom: 14px;
+}
+
+.admin-card h3 {
+    margin: 0 0 8px;
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.admin-card p {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.admin-card-action {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ff6a4d;
+}

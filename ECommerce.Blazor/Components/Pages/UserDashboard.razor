@@ -1,0 +1,105 @@
+@page "/"
+@inject ApiService ApiService
+@rendermode InteractiveServer
+@using ECommerce.Blazor.Services;
+<PageTitle>TechieHub</PageTitle>
+
+<header class="th-header">
+    <div class="th-brand">TechieHub</div>
+
+    <div class="th-search">
+        <input placeholder="Search products..." />
+        <span class="th-search-icon">🔍</span>
+    </div>
+
+    <div class="th-actions">
+        <NavLink href="/cart" class="th-cart">Cart-🛒</NavLink>
+        <NavLink href="/admin/login" class="th-login">Login</NavLink>
+    </div>
+</header>
+
+<nav class="th-navbar">
+   <div class="th-nav-item th-dropdown">
+    <span class="th-dropdown-trigger">All Categories</span>
+
+    <div class="th-dropdown-panel">
+        @foreach (var c in categories)
+        {
+            <NavLink href="@($"/category/{c.Id}")"
+                     class="th-dropdown-item">
+                @c.Name
+            </NavLink>
+        }
+    </div>
+</div>
+
+
+    <NavLink href="/products" class="th-nav-item">Products</NavLink>
+    <NavLink href="/" class="th-nav-item">Blog</NavLink>
+    <NavLink href="/" class="th-nav-item">Contact</NavLink>
+</nav>
+
+
+<section class="th-hero">
+    <div class="th-hero-content">
+        <h1>Your One-Stop <br />Electronic Market</h1>
+
+        <p>
+            Welcome to TechieHub, a place where you can buy everything
+            about electronics. Sale every day.
+        </p>
+
+        <NavLink href="/products" class="th-hero-btn">
+            Shop Now
+        </NavLink>
+    </div>
+
+    <div class="th-hero-image">
+        <img src="ProductImage/Landing.jpg" alt="Electronics" />
+    </div>
+</section>
+
+<section class="th-features">
+    <div class="th-feature">
+        <span class="th-feature-icon">🎧</span>
+        <div>
+            <h4>Responsive</h4>
+            <p>Customer service available 24/7</p>
+        </div>
+    </div>
+
+    <div class="th-feature">
+        <span class="th-feature-icon">🛡️</span>
+        <div>
+            <h4>Secure</h4>
+            <p>Certified marketplace since 2017</p>
+        </div>
+    </div>
+
+    <div class="th-feature">
+        <span class="th-feature-icon">🚚</span>
+        <div>
+            <h4>Shipping</h4>
+            <p>Free, fast, and reliable worldwide</p>
+        </div>
+    </div>
+
+    <div class="th-feature">
+        <span class="th-feature-icon">🔄</span>
+        <div>
+            <h4>Transparent</h4>
+            <p>Hassle-free return policy</p>
+        </div>
+    </div>
+</section>
+
+
+
+@code {
+    List<CategoryDto> categories = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await ApiService.GetActiveCategoriesAsync();
+    }
+}

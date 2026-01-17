@@ -1,0 +1,229 @@
+@page "/admin/products"
+@using ECommerce.Blazor.State
+@using ECommerce.Blazor.Services
+@inject AppState AppState
+@inject ApiService ApiService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="admin-page-hero">
+    <h1 class="admin-page-title">Products</h1>
+    <p class="admin-page-description">
+        Manage and organize your store products
+    </p>
+</div>
+
+
+<!-- FILTERS -->
+<div class="product-filters">
+    <input placeholder="Search product..." @bind="searchText" @bind:event="oninput" />
+
+    <select @bind="selectedCategoryId">
+        <option value="0">All Categories</option>
+        @foreach (var c in categories)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+</div>
+@if (!string.IsNullOrEmpty(error))
+{
+    <p class="error-text">@error</p>
+}
+<!-- ADD PRODUCT -->
+<div class="product-form">
+    <input placeholder="Name" @bind="form.Name" />
+    <input type="number" placeholder="Price" step="0.01" @bind="form.Price" />
+    <input placeholder="Description" @bind="form.Description" />
+    <input placeholder="Stock" type="number" @bind="form.StockQuantity" />
+
+    <InputFile OnChange="OnImageSelected" />
+
+    @if (!string.IsNullOrEmpty(imagePreview))
+    {
+        <img src="@imagePreview" class="image-preview" />
+    }
+
+    <select @bind="form.CategoryId">
+        <option value="0">Select Category</option>
+        @foreach (var c in categories)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+
+    <button @onclick="SaveProduct"
+            disabled="@(string.IsNullOrWhiteSpace(form.Name) || form.CategoryId <= 0 || uploading)">
+        @(uploading ? "Uploading..." : editingId == null ? "Add Product" : "Update Product")
+    </button>
+</div>
+
+<!-- PRODUCTS TABLE -->
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in FilteredProducts)
+        {
+            <tr>
+                <td>@p.Id</td>
+                <td>@p.Name</td>
+                <td>@p.CategoryName</td>
+                <td>@p.Price</td>
+                <td>@p.StockQuantity</td>
+                <td>
+                    <span class="status @(p.IsActive ? "active" : "inactive")">
+                        @(p.IsActive ? "Active" : "Inactive")
+                    </span>
+                </td>
+                <td>
+                    <button @onclick="() => Edit(p)">Edit</button>
+                    <button @onclick="() => Disable(p.Id)">Disable</button>
+                    <button class="danger" @onclick="() => Delete(p.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    string? error;
+
+    IBrowserFile? selectedImage;
+string? imagePreview;
+bool uploading = false;
+
+    List<ProductDto> products = new();
+    List<CategoryDto> categories = new();
+
+    CreateProductDto form = new();
+    int? editingId = null;
+
+    string searchText = "";
+    int selectedCategoryId = 0;
+
+    IEnumerable<ProductDto> FilteredProducts =>
+        products.Where(p =>
+            (string.IsNullOrWhiteSpace(searchText) ||
+             p.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
+            (selectedCategoryId == 0 || p.CategoryId == selectedCategoryId));
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!AppState.IsLoggedIn || !AppState.IsAdmin)
+            {
+                Navigation.NavigateTo("/admin/login");
+                return;
+            }
+
+            categories = await ApiService.GetAllCategoriesAsync();
+            products = await ApiService.GetAllProductsAsync();
+            StateHasChanged();
+        }
+    }
+
+  async Task SaveProduct()
+{
+    error = null;
+
+    if (string.IsNullOrWhiteSpace(form.Name))
+    {
+        error = "Product name is required";
+        return;
+    }
+
+    if (form.CategoryId <= 0)
+    {
+        error = "Please select a category";
+        return;
+    }
+
+    uploading = true;
+
+    // Upload only if a new image is selected
+    if (selectedImage != null)
+    {
+        var imageUrl = await ApiService.UploadProductImageAsync(selectedImage);
+        if (imageUrl == null)
+        {
+            error = "Image upload failed";
+            uploading = false;
+            return;
+        }
+
+        form.ImageUrl = imageUrl;
+    }
+
+    var result = editingId == null
+        ? await ApiService.CreateProductAsync(form)
+        : await ApiService.UpdateProductAsync(editingId.Value, form);
+
+    if (result == null)
+    {
+        error = "Failed to save product";
+        uploading = false;
+        return;
+    }
+
+    // Reset
+    form = new CreateProductDto();
+    editingId = null;
+    selectedImage = null;
+    imagePreview = null;
+    uploading = false;
+
+    products = await ApiService.GetAllProductsAsync();
+}
+
+
+
+
+
+    void Edit(ProductDto p)
+    {
+        editingId = p.Id;
+        form = new CreateProductDto
+        {
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            StockQuantity = p.StockQuantity,
+            ImageUrl = p.ImageUrl,
+            CategoryId = p.CategoryId
+        };
+    }
+
+    async Task Disable(int id)
+    {
+        await ApiService.DeactivateProductAsync(id);
+        products = await ApiService.GetAllProductsAsync();
+    }
+
+    async Task Delete(int id)
+    {
+        await ApiService.DeleteProductAsync(id);
+        products = await ApiService.GetAllProductsAsync();
+    }
+
+    async Task OnImageSelected(InputFileChangeEventArgs e)
+{
+    selectedImage = e.File;
+
+    var buffer = new byte[selectedImage.Size];
+    await selectedImage.OpenReadStream(maxAllowedSize: 5_000_000).ReadAsync(buffer);
+
+    imagePreview = $"data:{selectedImage.ContentType};base64,{Convert.ToBase64String(buffer)}";
+}
+
+}

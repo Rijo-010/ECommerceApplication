@@ -97,7 +97,16 @@ namespace ECommerce.Api.Services
             return true;
         }
 
+         bool ICategoryService.Activate(int id)
+        {
+            var category = _context.Categories.Find(id);
+            if (category == null)
+                return false;
 
+            category.IsActive = !category.IsActive;
+            _context.SaveChanges();
+            return true;
+        }
         private static CategoryDto Map(Category c)
         {
             return new CategoryDto
@@ -108,5 +117,7 @@ namespace ECommerce.Api.Services
                 IsActive = c.IsActive
             };
         }
+
+        
     }
 }

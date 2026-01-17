@@ -1,0 +1,59 @@
+@page "/cart"
+@using ECommerce.Blazor.State
+@inject CartState CartState
+@rendermode InteractiveServer
+
+<h2 class="cart-title">Your Cart</h2>
+
+@if (!CartState.Items.Any())
+{
+    <p class="empty-text">Your cart is empty</p>
+}
+else
+{
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in CartState.Items)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>₹@item.Product.Price</td>
+                    <td>@item.Quantity</td>
+                    <td>₹@(item.Product.Price * item.Quantity)</td>
+                    <td>
+                        <button class="danger"
+                                @onclick="() => Remove(item.Product.Id)">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+@if (!string.IsNullOrEmpty(deletemessage))
+    {
+        <p class="success-text">@deletemessage</p>
+    }
+    <div class="cart-summary">
+        <h3>Total: ₹@CartState.TotalPrice</h3>
+    </div>
+}
+
+@code {
+    string? deletemessage;
+
+    private void Remove(int productId)
+    {
+        CartState.Remove(productId);
+        deletemessage = "Item removed from cart.";
+    }
+}

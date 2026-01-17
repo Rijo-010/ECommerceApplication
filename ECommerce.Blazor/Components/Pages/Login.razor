@@ -1,0 +1,74 @@
+@page "/admin/login"
+@using ECommerce.Blazor.State
+@using ECommerce.Blazor.Services
+@inject NavigationManager Navigation
+@inject AppState AppState
+@inject ApiService ApiService
+@rendermode InteractiveServer
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2 class="login-title">Welcome Back</h2>
+        <p class="login-subtitle">Sign in to continue</p>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input @bind="username" placeholder="Enter your username" />
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" @bind="password" placeholder="Enter your password" />
+        </div>
+
+        <button class="login-btn" @onclick="LoginAsync">
+            Login
+        </button>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <p class="error-text">@error</p>
+        }
+    </div>
+</div>
+
+<p style="color:red">@error</p>
+
+@code {
+    private string username = "";
+    private string password = "";
+    private string? error;
+
+    private async Task LoginAsync()
+    {
+        error = null;
+
+        try
+        {
+            var result = await ApiService.LoginAsync(username, password);
+
+            if (result == null)
+            {
+                error = "Invalid username or password";
+                return;
+            }
+
+            AppState.IsLoggedIn = true;
+            AppState.Username = result.Username;
+            AppState.Role = result.Role;
+            await InvokeAsync(StateHasChanged);
+            if (AppState.IsAdmin)
+                Navigation.NavigateTo("/admin", forceLoad: false);
+            else
+                Navigation.NavigateTo("/", forceLoad: false);
+        }
+        catch (HttpRequestException)
+        {
+            error = "Cannot connect to server. Please try again.";
+        }
+        catch (Exception ex)
+        {
+            error = $"Unexpected error: {ex.Message}";
+        }
+    }
+}

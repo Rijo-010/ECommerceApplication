@@ -1,0 +1,46 @@
+@page "/admin"
+@using ECommerce.Blazor.State
+@inject AppState AppState
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="admin-header">
+    <h2 class="admin-title">Admin Dashboard</h2>
+    <p class="admin-subtitle">Select what you want to manage</p>
+</div>
+
+<div class="admin-cards">
+    <div class="admin-card" @onclick="NavigateToCategories">
+        <div class="admin-card-icon">📂</div>
+        <h3>Categories</h3>
+        <p>Organize and manage product categories</p>
+        <span class="admin-card-action">Manage →</span>
+    </div>
+
+    <div class="admin-card" @onclick="NavigateToProducts">
+        <div class="admin-card-icon">📦</div>
+        <h3>Products</h3>
+        <p>Create, update and manage products</p>
+        <span class="admin-card-action">Manage →</span>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && (!AppState.IsLoggedIn || !AppState.IsAdmin))
+        {
+            Navigation.NavigateTo("/admin/login");
+        }
+    }
+
+    private void NavigateToCategories()
+    {
+        Navigation.NavigateTo("/admin/categories");
+    }
+
+    private void NavigateToProducts()
+    {
+        Navigation.NavigateTo("/admin/products");
+    }
+}

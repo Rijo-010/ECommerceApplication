@@ -1,0 +1,128 @@
+@page "/admin/categories"
+@using ECommerce.Blazor.State
+@using ECommerce.Blazor.Services
+@inject AppState AppState
+@inject ApiService ApiService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<div class="admin-page-header">
+    <h2 class="admin-title">Categories</h2>
+    <p class="admin-subtitle">Manage product categories</p>
+</div>
+
+
+<div class="category-header">
+    <div class="category-form">
+        <input placeholder="Category name" @bind="newName" />
+        <input placeholder="Description" @bind="newDescription" />
+        <button @onclick="AddCategory">Add Category</button>
+    </div>
+
+    <input class="filter-input"
+           placeholder="Search categories..."
+           @bind="searchText"
+           @bind:event="oninput" />
+</div>
+
+
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in FilteredCategories)
+        {
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.Name</td>
+                <td>@c.Description</td>
+                <td>
+                    @if (c.IsActive)
+                    {
+                        <span class="status active">Active</span>
+                    }
+                    else
+                    {
+                        <span class="status inactive">Inactive</span>
+                    }
+                </td>
+                <td>
+                    <button @onclick="() => Deactivate(c.Id)">Disable</button>
+                    <button class="danger" @onclick="() => Delete(c.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    List<CategoryDto> categories = new();
+
+    string newName = "";
+    string? newDescription;
+        string searchText = "";
+
+IEnumerable<CategoryDto> FilteredCategories =>
+    string.IsNullOrWhiteSpace(searchText)
+        ? categories
+        : categories.Where(c =>
+            c.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            (c.Description ?? "").Contains(searchText, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!AppState.IsLoggedIn || !AppState.IsAdmin)
+            {
+                Navigation.NavigateTo("/admin/login");
+                return;
+            }
+
+            await LoadCategories();
+        }
+    }
+
+    async Task LoadCategories()
+    {
+        categories = await ApiService.GetAllCategoriesAsync();
+        StateHasChanged();
+    }
+
+    async Task AddCategory()
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+            return;
+
+        await ApiService.CreateCategoryAsync(new CreateCategoryDto
+        {
+            Name = newName,
+            Description = newDescription
+        });
+
+        newName = "";
+        newDescription = "";
+
+        await LoadCategories();
+    }
+
+    async Task Deactivate(int id)
+    {
+        await ApiService.DeactivateCategoryAsync(id);
+        await LoadCategories();
+    }
+
+    async Task Delete(int id)
+    {
+        await ApiService.DeleteCategoryAsync(id);
+        await LoadCategories();
+    }
+}
